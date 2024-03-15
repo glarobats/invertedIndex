@@ -54,7 +54,7 @@ public class invertedIndex {
             // Μετατροπή του κειμένου σε πεζά
             String line = value.toString().toLowerCase();
             // Αφαίρεση των σημείων στίξης
-            line = line.replaceAll("[^a-zA-Z\\s]", "");
+            line = line.replaceAll("[^a-z A-Z\\s]", "");
             // Χωρίζει το κείμενο σε λέξεις
             StringTokenizer tokenizer = new StringTokenizer(line);
 
@@ -75,14 +75,20 @@ public class invertedIndex {
 
     public static class Reduce extends Reducer<Text, Text, Text, Text> {
         public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            // Δημιουργεί ένα HashSet για τις μοναδικές τιμές
             HashSet<String> uniqueValues = new HashSet<>();
-            for (Text val : values) {
+
+            // Προσθέτει τις τιμές στο HashSet
+            for (Text val : values)
                 uniqueValues.add(val.toString());
-            }
+
+            // Αποθηκεύει τις τιμές σε ένα StringBuilder
             StringBuilder result = new StringBuilder();
-            for (String val : uniqueValues) {
+
+            // Προσθέτει τις τιμές στο StringBuilder
+            for (String val : uniqueValues)
                 result.append(val).append(", ");
-            }
+
             context.write(key, new Text(result.toString()));
         }
     }
