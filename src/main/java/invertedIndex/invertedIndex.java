@@ -19,7 +19,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 public class invertedIndex {
 
     //  Ρυθμίζει το ελάχιστο μήκος των λέξεων στο configuration file (ορίζετε εσείς το μέγεθος)
-    static int minLength = 10;
+    static int minLength;
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
@@ -34,19 +34,14 @@ public class invertedIndex {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        minLength = Integer.parseInt(args[2]);
+        conf.setInt("minLength", minLength);
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
     public static class Map extends Mapper<LongWritable, Text, Text, Text> {
         private final static Text word = new Text();
         private Text fileName = new Text();
-
-        @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
-            Configuration conf = context.getConfiguration();
-            minLength = conf.getInt("nGrams", minLength); // Προεπιλεγμένο μέγεθος των n-grams
-        }
-
 
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             // Παίρνουμε το όνομα του αρχείου
